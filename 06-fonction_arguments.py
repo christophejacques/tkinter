@@ -32,6 +32,5 @@ button1 = ttk.Button(
 button1.pack(pady=10)
 
 
-
 # Run
 window.mainloop()

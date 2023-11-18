@@ -5,10 +5,12 @@ from tkinter import ttk
 def dprint(*args, **kwargs):
     print(*args, **kwargs, flush=True)
 
+
 def button_function(valeur):
     def fonction():
         dprint(valeur.get())
     return fonction
+
 
 # window 
 window = tk.Tk()
@@ -16,9 +18,12 @@ window.title("Layout")
 # window.geometry("600x400")
 window.geometry("400x600")
 
+
 def bind_function(param):
     if param.keycode == 27:
         window.quit()
+
+
 window.bind("<KeyPress>", bind_function)
 
 # Layout
@@ -89,4 +94,3 @@ if True:
 
 # Run
 window.mainloop()
-

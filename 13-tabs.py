@@ -5,19 +5,24 @@ from tkinter import ttk
 def dprint(*args, **kwargs):
     print(*args, **kwargs, flush=True)
 
+
 def button_function(valeur):
     def fonction():
         dprint(valeur.get())
     return fonction
+
 
 # window 
 window = tk.Tk()
 window.title("Tabs")
 window.geometry("600x400")
 
+
 def bind_function(param):
     if param.keycode == 27:
         window.quit()
+
+
 window.bind("<KeyPress>", bind_function)
 
 
@@ -50,8 +55,5 @@ tabs.add(tab1, text="Tab 1")
 tabs.add(tab2, text="Tab 2")
 tabs.add(tab3, text="Tab 3")
 
-
-
 # Run
 window.mainloop()
-

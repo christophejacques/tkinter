@@ -7,19 +7,24 @@ from time import sleep
 def dprint(*args, **kwargs):
     print(*args, **kwargs, flush=True)
 
+
 def button_function(valeur):
     def fonction():
         dprint(valeur.get())
     return fonction
+
 
 # window 
 window = tk.Tk()
 window.title("Progressbar & Sliders")
 # window.geometry("400x300")
 
+
 def bind_function(param):
     if param.keycode == 27:
         window.quit()
+
+
 window.bind("<KeyPress>", bind_function)
 
 
@@ -40,6 +45,7 @@ pb = ttk.Progressbar(
     length=298)
 pb.pack(pady=10)
 
+
 def update_bar():
     valeur: int = pb["value"]
     if valeur < 100:
@@ -47,6 +53,7 @@ def update_bar():
         pb.after(100, update_bar)
     else:
         window.quit()
+
 
 # pb.after(100, update_bar)
 pb.start()
@@ -60,4 +67,3 @@ st.pack()
 
 # Run
 window.mainloop()
-

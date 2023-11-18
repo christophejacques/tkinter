@@ -5,19 +5,24 @@ from tkinter import ttk
 def dprint(*args, **kwargs):
     print(*args, **kwargs, flush=True)
 
+
 def button_function(valeur):
     def fonction():
         dprint(valeur.get())
     return fonction
+
 
 # window 
 window = tk.Tk()
 window.title("Frames & Parenting")
 window.geometry("600x400")
 
+
 def bind_function(param):
     if param.keycode == 27:
         window.quit()
+
+
 window.bind("<KeyPress>", bind_function)
 
 
@@ -45,4 +50,3 @@ label2.pack()
 
 # Run
 window.mainloop()
-

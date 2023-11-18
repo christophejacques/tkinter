@@ -6,11 +6,11 @@ from random import choice
 def dprint(*args, **kwargs):
     print(*args, **kwargs, flush=True)
 
+
 def button_function(valeur):
     def fonction():
         dprint(valeur.get())
     return fonction
-
 
 
 # window 
@@ -18,10 +18,13 @@ window = tk.Tk()
 window.title("Tkinter Treeview")
 # window.geometry("400x300")
 
+
 def bind_function(param):
     # dprint(param)
     if param.keycode == 27:
         window.quit()
+
+
 window.bind("<KeyPress>", bind_function)
 
 # Treeview
@@ -45,12 +48,14 @@ for idx in range(100):
     prenom = choice(first_names)
     table.insert(
         parent="",
-        index=tk.END, # idx
+        index=tk.END,  # idx
         values=(prenom, nom, f"{prenom.lower()}.{nom.lower()}@gmail.com"))
+
 
 def print_selected(_):
     for ligne in table.selection():
         print(table.item(ligne)["values"])
+
 
 def delete_selected(_):
     for ligne in table.selection():
