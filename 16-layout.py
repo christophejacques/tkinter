@@ -115,7 +115,7 @@ if False:
     bouton.pack(side="bottom", fill="both", expand=True)
 
 if True:
-    label1.place(x = 10, y = 10, width = 380, height = 150)
+    label1.place(x=10, y=10, width=380, height=150)
     # label1.place(relx = 0.5, rely = 0.5, relwidth = 0.5, height = 200, anchor="center")
     label2.place(relx=0, rely=0.3, relwidth=0.8, relheight=0.7, anchor="nw")
     label3.place(relx=0.8, rely=0.3, relwidth=0.2, relheight=0.35)

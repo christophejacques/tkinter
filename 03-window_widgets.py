@@ -10,12 +10,14 @@ def dprint(*args, **kwargs):
 def button_function():
     window.quit()
 
+
 def valider_bouton():
     label2["text"] = entree.get()
     entree["state"] = "disabled"
     bouton1["state"] = "disabled"
     for attribut in label2.configure():
         print(label2.configure().get(attribut))
+
 
 # window = tk.Tk()
 window = tk.Tk()

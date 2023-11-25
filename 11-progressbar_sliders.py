@@ -1,7 +1,5 @@
 import tkinter as tk
 from tkinter import ttk, scrolledtext
-from random import choice
-from time import sleep
 
 
 def dprint(*args, **kwargs):

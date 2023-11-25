@@ -34,6 +34,7 @@ label3 = ttk.Label(master=window, text="Label 3", background="green")
 labels: dict = {}
 labels["label1"] = True
 
+
 def toggle_button(btn_label: str):
     def action(*args, **kwargs):
         if labels[btn_label]:
@@ -45,11 +46,14 @@ def toggle_button(btn_label: str):
         labels[btn_label] = not labels[btn_label]
     return action
 
+
 def action2():
     label2.tkraise(aboveThis=label1)
 
+
 def action3():
     label3.tkraise(aboveThis=label2)
+
 
 def toggle_grid():
     if labels["label1"]:
@@ -58,6 +62,7 @@ def toggle_grid():
         label1.grid(column=0, row=0)
 
     labels["label1"] = not labels["label1"]
+
 
 if False:
     # Place
@@ -91,20 +96,24 @@ def toggle_pack():
     if labels["label1"]:
         label1.pack_forget()
     else:
-        label1.pack(expand=True)
+        # label1.pack(expand=True, fill="both", before=bouton1)  # Ou v
+        label1.pack(expand=True, fill="both")
 
     labels["label1"] = not labels["label1"]
 
+
 if True:
     # Pack
+    frame = ttk.Frame(master=window)
+    label1 = ttk.Label(master=frame, text="Label 1", background="red")
     bouton1 = ttk.Button(
         master=window, 
         text="toggle Label1",
         width=40,
         command=toggle_pack)
-    
-    label1.pack(expand=True)
-    bouton1.pack(side="bottom")
+    frame.pack(side="top", expand=True, fill="both")
+    label1.pack(expand=True, fill="both")
+    bouton1.pack(side="top")
 
 
 # Run

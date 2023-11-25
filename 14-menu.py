@@ -52,8 +52,8 @@ edit_menu.add_command(label="Coller", command=lambda: print("Paste"))
 menu.add_cascade(label="Edition", menu=edit_menu)
 
 help_menu = tk.Menu(master=menu, tearoff=False)
-help_menu.add_command(label = "Bienvenue", command=lambda: print("Aider"))
-help_menu.add_command(label = "Vérifier les mises à jour", command=lambda: print("Update"))
+help_menu.add_command(label="Bienvenue", command=lambda: print("Aider"))
+help_menu.add_command(label="Vérifier les mises à jour", command=lambda: print("Update"))
 
 toujours_afficher = tk.BooleanVar()
 help_menu.add_checkbutton(
@@ -62,9 +62,9 @@ help_menu.add_checkbutton(
     offvalue=False,
     variable=toujours_afficher)
 help_menu.add_separator()
-help_menu.add_command(label = "A propos de", command=lambda: print("Aider"))
+help_menu.add_command(label="A propos de", command=lambda: print("Aider"))
 
-menu.add_cascade(label = "Aide", menu=help_menu)
+menu.add_cascade(label="Aide", menu=help_menu)
 
 window.configure(menu=menu)
 
