@@ -83,7 +83,7 @@ class cFrame(ttk.Frame):
 
 
 class App(tk.Tk):
-    def __init__(self, title: str, size: tuple):
+    def __init__(self, title: str, size: tuple, position: tuple = (-1, -1)):
         # Main setup
         super().__init__()
         
@@ -92,8 +92,8 @@ class App(tk.Tk):
         
         # Centre la fenetre
         screen_size = self.get_screenSize()
-        posx = screen_size[0]//2 - size[0]//2
-        posy = screen_size[1]//2 - size[1]//2
+        posx = (screen_size[0]//2 - size[0]//2) if position[0] == -1 else position[0]
+        posy = screen_size[1]//2 - size[1]//2 if position[1] == -1 else position[1]
         
         self.geometry(f"{size[0]}x{size[1]}+{posx}+{posy}")
         self.minsize(*size)

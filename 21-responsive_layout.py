@@ -1,13 +1,12 @@
 from os import path
-from tkinter import ttk
 
 
 saved_width: int = 0
 maClasse = __import__("20-classes") 
 App = getattr(maClasse, "App")
 
-app = maClasse.App(__file__.split(path.sep)[-1], (200, 400))
-app.maxsize(800, 400)
+app = maClasse.App(__file__.split(path.sep)[-1], (200, 400), (300, 200))
+app.maxsize(1000, 400)
 
 f1 = app.add_frame("pack", expand=True, fill="both")
 f2 = app.add_frame("pack", expand=True, fill="both")
@@ -57,7 +56,7 @@ def frame_600():
     f2.pack(side="left", expand=True, fill="both")
 
 
-def app_resize(event):
+def app_resize(event) -> None:
     global saved_width
 
     if event.widget.__class__.__name__ == "App":
