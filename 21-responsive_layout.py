@@ -18,12 +18,12 @@ l3 = f2.add_widget("label", text="Label 3", background="red")
 l4 = f2.add_widget("label", text="Label 4", background="grey")
 
 
-def forget_app_layout():
+def forget_app_layout() -> None:
     [frame.pack_forget() for frame in (f1, f2)]
     [label.pack_forget() for label in (l1, l2, l3, l4)]
 
 
-def frame_200():
+def frame_200() -> None:
     forget_app_layout()
     l1.pack(side="top", expand=True, fill="both", padx=10, pady=(10, 5))
     l2.pack(side="top", expand=True, fill="both", padx=10, pady=5)
@@ -34,7 +34,7 @@ def frame_200():
     f2.pack(side="top", expand=True, fill="both")
 
 
-def frame_400():
+def frame_400() -> None:
     forget_app_layout()
     l1.pack(side="left", expand=True, fill="both", padx=(10, 5), pady=(10, 5))
     l2.pack(side="left", expand=True, fill="both", padx=(5, 10), pady=(10, 5))
@@ -45,7 +45,7 @@ def frame_400():
     f2.pack(side="top", expand=True, fill="both")
 
 
-def frame_600():
+def frame_600() -> None:
     forget_app_layout()
     l1.pack(side="left", expand=True, fill="both", padx=(10, 5), pady=10)
     l2.pack(side="left", expand=True, fill="both", padx=5, pady=10)
