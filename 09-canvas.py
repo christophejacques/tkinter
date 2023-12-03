@@ -59,18 +59,18 @@ clique_souris = tk.BooleanVar()
 canvas.create_window((330, 250), 
     window=ttk.Button(window, text="Valider"))
 
+
 def click_event(event):
     if event.num == 1:
         clique_souris.set(True)
         dprint("mouseButton down", event)
+
 
 def release_event(event):
     if event.num == 1:
         clique_souris.set(False)
         dprint("mouseButton up")
 
-window.bind("<Button>", click_event)
-window.bind("<ButtonRelease>", release_event)
 
 def print_pixel(event):
     if not clique_souris.get():
@@ -79,6 +79,10 @@ def print_pixel(event):
     canvas.create_oval(
         (event.x-size, event.y-size, event.x+size, event.y+size),
         fill="black")
+
+
+window.bind("<Button>", click_event)
+window.bind("<ButtonRelease>", release_event)
 
 window.bind("<Motion>", print_pixel)
 

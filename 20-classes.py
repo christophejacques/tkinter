@@ -7,6 +7,17 @@ def dprint(*args, **kwargs):
     print(*args, **kwargs, flush=True)
 
 
+class cTKConstante:
+
+    def __init__(self):        
+        if len(list(filter(lambda x: not x.startswith("_"), dir(cTKConstante)))) > 0:
+            return
+            
+        for attrib in dir(tk):
+            if attrib == attrib.upper():
+                setattr(cTKConstante, attrib, getattr(tk, attrib))
+
+
 # Classes
 class cWidget:
 
@@ -25,7 +36,8 @@ class cWidget:
         "spinbox": ttk.Spinbox,
         "progressbar": ttk.Progressbar,
         "scale": ttk.Scale,
-        "canvas": tk.Canvas
+        "canvas": tk.Canvas,
+        "treeview": ttk.Treeview
     }
 
     def __init__(self, parent, type_widget: str):
@@ -74,6 +86,8 @@ class App(tk.Tk):
     def __init__(self, title: str, size: tuple):
         # Main setup
         super().__init__()
+        
+        self.constantes = cTKConstante()
         self.title(title)
         
         # Centre la fenetre
