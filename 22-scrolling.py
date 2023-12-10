@@ -3,7 +3,6 @@ from os import path
 
 saved_width: int = 0
 maClasse = __import__("20-classes") 
-App = getattr(maClasse, "App")
 
 app = maClasse.App(__file__.split(path.sep)[-1], (1000, 400))
 
@@ -33,22 +32,23 @@ def myCanvas():
 
 
 def myTreeView():
-    f1 = app.add_frame("pack", expand=True, fill="both")
-    tv = f1.add_widget("treeview", show="headings", columns=(1,))
-    tv.pack(side="left", expand=True, fill="both")
-    sby = f1.add_widget("scrollbar", orient="vertical", command=tv.yview)
-    f1.pack()
-    tv.heading(0, text="Adresse EMail")
-    sby.pack(side="left", fill="y")
+    with app.add_frame("pack", expand=True, fill="both") as f1:
+        tv = f1.add_widget("treeview", show="headings", columns=(1,))
+        tv.pack(side="left", expand=True, fill="both")
+        sby = f1.add_widget("scrollbar", orient="vertical", command=tv.yview)
+        f1.pack()
+        
+        tv.heading(0, text="Adresse EMail")
+        sby.pack(side="left", fill="y")
 
-    tv.configure(yscrollcommand=sby.set)
+        tv.configure(yscrollcommand=sby.set)
 
-    for idx in range(100):
-        tv.insert(
-            parent="",
-            # index=idx,  # tk.END,  # idx
-            index=app.constantes.END,  
-            values=(f"adresse{idx}@gmail.com"))
+        for idx in range(100):
+            tv.insert(
+                parent="",
+                # index=idx,  # tk.END,  # idx
+                index=app.constantes.END,  
+                values=(f"adresse{idx}@gmail.com"))
 
 
 # myCanvas()
