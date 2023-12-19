@@ -15,10 +15,16 @@ style = ttk.Style()
 fprint(style.theme_names())
 style.theme_use("clam")
 
-style.configure("new.TButton", background="lightgreen", foreground="black", font=("Arial", 20))
+style.configure("TFrame", background="pink")
+style.configure("new.TButton", background="green", foreground="black", font=("Arial", 20))
 style.map("new.TButton", 
-    foreground=[("pressed", "red"), ("disabled", "gray"), ("active", "red")],
+    foreground=[("pressed", "red"),    ("disabled", "gray"),      ("active", "blue")],
     background=[("pressed", "yellow"), ("disabled", "lightgray"), ("active", "lightgreen")])
+
+
+def close_app():
+    app.destroy()
+    app.quit()
 
 
 def Window1():
@@ -30,16 +36,17 @@ def Window1():
             background="orange",
             foreground="brown",
             anchor="c").pack(expand=True, fill="both")
-        with f1.add_frame("pack", expand=True) as sf1:
+        with f1.add_frame("pack", expand=True, fill="both") as sf1:
 
             sf1.add_widget("button", 
-                text=" Open Window ",
-                style="new.TButton").pack(side="left")
+                text=" Quitter ",
+                style="new.TButton",
+                command=close_app).pack(side="left", expand=True)
 
             sf1.add_widget("button", 
                 text="Disable",
                 state="disabled",
-                style="new.TButton").pack(side="left")
+                style="new.TButton").pack(side="left", expand=True)
 
 
 Window1()

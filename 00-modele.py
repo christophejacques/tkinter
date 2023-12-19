@@ -1,19 +1,20 @@
 from os import path
 
 
-def fprint(*args, **kwargs):
-    print(*args, **kwargs, flush=True)
+tkinter_classe = __import__("20-classes")
+fprint = tkinter_classe.fprint
+app = tkinter_classe.App(__file__.split(path.sep)[-1], (500, 300))
 
 
-maClasse = __import__("20-classes") 
-app = maClasse.App(__file__.split(path.sep)[-1], (400, 300))
-
-
-def Window1():
+def main():
     app.maxsize(600, 400)
-    with app.add_frame("pack", expand=True, fill="both") as f1:
-        f1.add_widget("label", text="Appuyer sur la touche 'Echap' pour quitter l'application").pack(expand=True, pady=(0,30))
+    color: str = "#303436"  # "#3D7476"
+    with app.add_frame(frame_params={"bg": color}) as f1:
+        message = "Appuyer sur la touche 'Echap' \npour fermer l'application\n"
+        f1.add_widget("label", text=message, fg="white", bg=color, font=20).pack(expand=True)
+
+    app.run()
 
 
-Window1()
-app.run()
+if __name__ == "__main__":
+    main()
