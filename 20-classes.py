@@ -1,3 +1,4 @@
+import re
 import ctypes
 import tkinter as tk
 from tkinter import ttk, scrolledtext
@@ -18,6 +19,9 @@ class cTKType:
 
 
 class cTKConstante:
+    CURSORS: list[str] = [
+        "arrow", "ibeam", "crosshair", "hand1", "hand2", "fleur", "man", "pencil", "pirate", 
+        "plus", "sb_h_double_arrow", "sb_v_double_arrow", "watch"]
 
     def __init__(self):        
         if len(list(filter(lambda x: not x.startswith("_"), dir(cTKConstante)))) > 0:
@@ -26,6 +30,19 @@ class cTKConstante:
         for attrib in dir(tk):
             if attrib == attrib.upper():
                 setattr(cTKConstante, attrib, getattr(tk, attrib))
+
+
+def check_kwargs(kwargs):
+    message: str = ""
+    for key in kwargs:
+        value = kwargs[key]
+        match key:
+            case "cursor": 
+                if value not in cTKConstante.CURSORS:
+                    message = f"'{value}' n'est pas un type de curseur valide"
+                    message += "\nLes valeurs valides sont: ("
+                    message += ", ".join(cTKConstante.CURSORS) + ")"
+                    raise Exception(message)
 
 
 # Classes
@@ -57,13 +74,49 @@ class cWidget:
     def __init__(self, parent, type_widget: str):
         self.parent = parent
         self.type_widget = type_widget
+        self.saved: dict = {}
 
+    def filtrage_kwargs(self, type_widget, kwargs):
+        kwargs_filtres: dict = {}
+        if type_widget != "label":
+            return kwargs_filtres
+
+        if "command" in kwargs:
+            kwargs_filtres["command"] = kwargs.pop("command")
+
+        return kwargs_filtres
+
+    def check_params(self, widget, **params):
+        kwargs_on: dict = {}
+        kwargs_off: dict = {}
+        type_widget = self.type_widget.lower()
+
+        for key in params:
+            match key:
+                case "command":
+                    if type_widget == "label":
+                        widget.bind("<Button-1>", params.get(key))
+                        
+                case "activeforeground" | "activebackground":
+                    new_key: str = "fg" if key == "activeforeground" else "bg"
+                    activebgcolor = widget.cget(new_key)
+                    newbgcolor = params.get(key)
+                    kwargs_on.update({new_key: newbgcolor})
+                    kwargs_off.update({new_key: activebgcolor})
+
+        if kwargs_on:
+            widget.bind("<Enter>", lambda _: widget.config(**kwargs_on))
+            widget.bind("<Leave>", lambda _: widget.config(**kwargs_off))
+    
     def parametres(self, **kwargs):
         type_widget = self.type_widget.lower()
         if type_widget not in cWidget.WIDGETS:        
             raise Exception(f"Le type de widget {self.type_widget} n'existe pas. Il faut saisir: Label, Text, ScrolledText, Combobox, etc...")
-
-        return cWidget.WIDGETS[type_widget](master=self.parent, **kwargs)
+        extension_kwargs = self.filtrage_kwargs(type_widget, kwargs)
+        widget = cWidget.WIDGETS[type_widget](master=self.parent, **kwargs)
+        kwargs.update(extension_kwargs)
+        self.check_params(widget, **kwargs)
+        return widget
 
 
 class Animation:
@@ -124,6 +177,7 @@ class cFrame(tk.Frame):
             super_params.update(kwargs.pop(key))
         
         super().__init__(master=parent, **super_params)
+
         default_kwargs: dict
         match type_layout.lower():
             case "pack":
@@ -151,6 +205,7 @@ class cFrame(tk.Frame):
         return new_frame
     
     def add_widget(self, type_widget: str, **kwargs) -> cWidget:
+        check_kwargs(kwargs)
         new_widget = cWidget(self, type_widget)
         return new_widget.parametres(**kwargs)
 
@@ -162,10 +217,17 @@ class cFrame(tk.Frame):
 
 
 class App(tk.Tk):
-    def __init__(self, title: str, size: tuple, position: tuple = (-1, -1)):
+    def __init__(self, title: str, size: tuple, position: tuple = (-1, -1), **options):
         # Main setup
         super().__init__()
-        
+
+        if not options.get("resizable", True):
+            self.resizable(False, False)
+
+        if not options.get("border", True):
+            # Suppression des bords de fenetre
+            self.overrideredirect(True)
+
         self.style = ttk.Style()
         self.style.theme_use("clam")
         # fprint(self.style.theme_names())
@@ -208,6 +270,151 @@ class App(tk.Tk):
     def close(self):
         self.destroy()
         self.quit()
+
+
+class Notification(App):
+    OPTIONS: dict = {
+        "show": False,
+        "fg": "white",
+        "bg": "#203040",
+        "align": "left"
+    }
+    BG_COLOR: str = "#203040"
+    FG_COLOR: str = "white"
+    DELAY: int = 5000  # 5 sec
+    SIZE: tuple = (360, 130)
+    PADY: int = 10
+
+    NOMBRE: int = 0
+    INSTANCES: list = list()
+
+    def __init__(self, titre, texte, **options):
+        if self.get_last_instance_pos_y() < (Notification.PADY+Notification.SIZE[1]):
+            raise Exception("Nombre trop important de notifications ouvertes")
+
+        self.titre = titre
+        self.texte = texte
+        self.options = self.OPTIONS.copy()
+
+        for option in options:
+            if option.lower() not in self.options:
+                msg: str = f"Option: -{option} inconnue\n"
+                msg += "Valeurs autorisée: -"
+                msg += ", -".join(Notification.OPTIONS)
+                raise Exception(msg)
+
+            else:
+                self.options[option] = options[option]
+
+        if self.options.get("show"):
+            self.show()
+
+    def add_line(self, frame, texte, fontsize):
+
+        options: dict = self.options.copy()
+        options["fontsize"] = fontsize
+
+        # Rechercher le texte compris entre {}
+        params: list = re.findall(r"\{(.*?)\=(.*?)\}", texte)
+        for key, value in params:
+            options[key] = value.lower()
+            texte = texte.replace(f"{{{key}={value}}}", "")
+
+        if options["align"] == "top":
+            options["justify"] = "center"
+        else:
+            options["justify"] = options["align"]
+
+        if options["align"] == "center":
+            options["align"] = "top"
+
+        frame.add_widget("label", 
+            fg=options["fg"], 
+            bg=options["bg"], 
+            text=texte, 
+            wraplength=Notification.SIZE[0] - 10,
+            justify=options["justify"],
+            font=(None, options["fontsize"])).pack(side=options["align"], fill="x")
+
+        # Sauvegarde globale pour les prochaines lignes
+        self.options.update(options)
+
+    def get_full_height(self, root_frame):
+        hauteur: int = 0
+        for itemf in root_frame.children:
+            frame = root_frame.children[itemf]
+            if frame.widgetName == "frame":
+                hauteur += self.get_full_height(frame)
+            else:
+                hauteur += frame.winfo_reqheight()
+
+        return hauteur
+
+    def get_last_instance_pos_y(self):
+        if len(Notification.INSTANCES) > 0:
+            return Notification.INSTANCES[-1].winfo_y()
+        else:
+            user32 = ctypes.windll.user32
+            return user32.GetSystemMetrics(1) - 40
+
+    def show(self):
+        self.size: tuple = Notification.SIZE[:]
+        width, height = self.size
+
+        super().__init__(self.titre, 
+            size=self.size, 
+            border=False)
+
+        with self.add_frame() as frame:
+
+            frame.add_widget("label", 
+                bg=self.options["bg"], 
+                text="").place(x=0, y=0, relwidth=1, relheight=1)
+
+            frame_titre = frame.add_frame("place", x=10, y=5, width=width-20, frame_params={"bg": self.options["bg"]})
+            self.add_line(frame_titre, self.titre, 14)
+
+            contenu = frame.add_frame("place", x=10, y=30, width=width-20)
+            for idx, ligne_texte in enumerate(self.texte.split("\n")):
+                if idx > 5:
+                    break
+
+                ligne = contenu.add_frame("pack", fill="x", frame_params={"bg": self.options["bg"]})
+                self.add_line(ligne, ligne_texte, 10)
+
+        real_height = self.get_full_height(frame)
+        if real_height > height:
+            height = real_height 
+        geometry: str = f"{width}x{height}"
+        geometry += f"+{self.winfo_screenwidth() - width - 10}"
+        geometry += f"+{self.get_last_instance_pos_y() - height - Notification.PADY}"
+        self.geometry(geometry)
+
+        Notification.NOMBRE += 1
+        Notification.INSTANCES.append(self)
+
+        self.after(Notification.DELAY, self.fermer)
+        self.screen_width = self.winfo_screenwidth()
+        self.run()
+
+    def fermer(self):
+        taille, x, y = self.geometry().split('+')
+        x = int(x) + 10
+        if x < self.screen_width:
+            self.geometry(f"{taille}+{x}+{y}")
+            self.after(5, self.fermer)
+
+        else:
+            height = self.winfo_height()
+            Notification.INSTANCES.remove(self)
+            Notification.NOMBRE -= 1
+
+            # descend les notifications restantes
+            for idx, instance in enumerate(Notification.INSTANCES):
+                taille, x, y = instance.geometry().split('+')
+                instance.geometry(f"{taille}+{x}+{Notification.PADY+height+int(y)}")
+            # Ferme la notification
+            self.close()
 
 
 def main():
@@ -261,12 +468,16 @@ def main():
             with fd1.add_frame(expand=True, fill="both") as fdp1:
                 fdp1.add_widget(
                     "Label", 
-                    text="Label3", background="red"
+                    text="Label3", 
+                    background="#BB0000", activebackground="red", 
+                    fg="white", activeforeground="yellow"
                     ).pack(side="left", expand=True, fill="both", padx=20, pady=(25, 5))
 
                 fdp1.add_widget(
                     "Label", 
-                    text="Label4", background="blue"
+                    text="Label4", 
+                    background="#0000BB", activebackground="blue", 
+                    fg="white", activeforeground="cyan"
                     ).pack(side="left", expand=True, fill="both", padx=20, pady=(25, 5))
 
         with frame_droite.add_frame(expand=True, fill="both") as fd2:
