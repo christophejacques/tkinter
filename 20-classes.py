@@ -32,6 +32,15 @@ class cTKConstante:
                 setattr(cTKConstante, attrib, getattr(tk, attrib))
 
 
+def set_config(obj, **params):
+    for key, value in obj.children.items():
+        if isinstance(value, cFrame):
+            value.config(**params)
+            set_config(value, **params)
+        else:
+            value.config(**params)
+
+
 def check_kwargs(kwargs):
     message: str = ""
     for key in kwargs:
@@ -273,6 +282,7 @@ class App(tk.Tk):
 
 
 class Notification(App):
+    MOUSE_WAIT: bool = False
     OPTIONS: dict = {
         "show": False,
         "fg": "white",
@@ -281,7 +291,7 @@ class Notification(App):
     }
     BG_COLOR: str = "#203040"
     FG_COLOR: str = "white"
-    DELAY: int = 5000  # 5 sec
+    DELAY: int = 8000  # 5 sec
     SIZE: tuple = (360, 130)
     PADY: int = 10
 
@@ -309,6 +319,26 @@ class Notification(App):
         if self.options.get("show"):
             self.show()
 
+    def lighter(self):
+        if self.options["bg"][1:].isnumeric():
+            valeur = self.options['bg'][1:]
+            res = ""
+            for i in range(3):
+                numeric = max(int("0x" + valeur[2*i:2*i+2], 16)+5, 0)
+                res += ("0" + hex(numeric)[2:])[-2:]
+
+            return f"#{res}"
+        else:            
+            return f"light{self.options['bg']}"
+
+    def mouse_in(self, *args):
+        Notification.MOUSE_WAIT = True
+        set_config(self, background=self.lighter())
+
+    def mouse_out(self, *args):
+        Notification.MOUSE_WAIT = False
+        set_config(self, background=self.options["bg"])
+
     def add_line(self, frame, texte, fontsize):
 
         options: dict = self.options.copy()
@@ -334,7 +364,8 @@ class Notification(App):
             text=texte, 
             wraplength=Notification.SIZE[0] - 10,
             justify=options["justify"],
-            font=(None, options["fontsize"])).pack(side=options["align"], fill="x")
+            font=(None, options["fontsize"])).pack(
+                side=options["align"], fill="x")
 
         # Sauvegarde globale pour les prochaines lignes
         self.options.update(options)
@@ -364,8 +395,8 @@ class Notification(App):
         super().__init__(self.titre, 
             size=self.size, 
             border=False)
-
-        with self.add_frame() as frame:
+        
+        with self.add_frame(frame_params={"bg": self.options["bg"]}) as frame:
 
             frame.add_widget("label", 
                 bg=self.options["bg"], 
@@ -382,23 +413,37 @@ class Notification(App):
                 ligne = contenu.add_frame("pack", fill="x", frame_params={"bg": self.options["bg"]})
                 self.add_line(ligne, ligne_texte, 10)
 
+        self.screen_width = self.winfo_screenwidth()
         real_height = self.get_full_height(frame)
         if real_height > height:
             height = real_height 
         geometry: str = f"{width}x{height}"
-        geometry += f"+{self.winfo_screenwidth() - width - 10}"
+        geometry += f"+{self.screen_width - width - 10}"
         geometry += f"+{self.get_last_instance_pos_y() - height - Notification.PADY}"
         self.geometry(geometry)
 
         Notification.NOMBRE += 1
         Notification.INSTANCES.append(self)
 
+        self.bind("<Enter>", self.mouse_in)
+        self.bind("<Leave>", self.mouse_out)
+
         self.after(Notification.DELAY, self.fermer)
-        self.screen_width = self.winfo_screenwidth()
         self.run()
 
     def fermer(self):
         taille, x, y = self.geometry().split('+')
+        
+        if self is not Notification.INSTANCES[0]:
+            # Ne pas fermer si ce n'est pas la premiere Notif
+            self.after(Notification.DELAY, self.fermer)
+            return
+
+        if Notification.MOUSE_WAIT and self.screen_width - int(x) - int(taille.split("x")[0]) == 10:
+            # Ne pas fermer si curseur souris dessus et non en train de se fermer
+            self.after(Notification.DELAY, self.fermer)
+            return
+
         x = int(x) + 10
         if x < self.screen_width:
             self.geometry(f"{taille}+{x}+{y}")

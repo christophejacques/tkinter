@@ -19,13 +19,16 @@ def notif(*args):
         show=True)
 
 
-frame = app.add_frame()
+frame = app.add_frame(frame_params={"bg": "#dddddd"})
 frame.add_widget("label", 
     text="Ouvrir un notification", 
     activeforeground="blue",
     font=("", 24),
     command=notif).pack(pady=20)
 frame.add_widget("button", text="deplacement", command=notif).pack(expand=True)
+
+# fprint(dir(app))
+# fprint(app.keys())
 
 app.run()
 fprint("Fin")

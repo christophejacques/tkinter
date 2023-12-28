@@ -1,10 +1,8 @@
-from os import path
-from random import randint
-
 
 tkinter_classe = __import__("20-classes")
 fprint = tkinter_classe.fprint
 App: type = tkinter_classe.App
+
 
 def click(*args):
     print(root.geometry(), flush=True)
