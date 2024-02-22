@@ -23,8 +23,9 @@ class cTKConstante:
         "arrow", "ibeam", "crosshair", "hand1", "hand2", "fleur", "man", "pencil", "pirate", 
         "plus", "sb_h_double_arrow", "sb_v_double_arrow", "watch"]
 
-    def __init__(self):        
-        if len(list(filter(lambda x: not x.startswith("_"), dir(cTKConstante)))) > 0:
+    def __init__(self):
+        # Prendre en compte la constante CURSEUR donc au moins 1
+        if len(list(filter(lambda x: not x.startswith("_"), dir(cTKConstante)))) > 1:
             return
             
         for attrib in dir(tk):
@@ -249,7 +250,7 @@ class App(tk.Tk):
         # Centre la fenetre
         screen_size = self.get_screenSize()
         posx = (screen_size[0]//2 - size[0]//2) if position[0] == -1 else position[0]
-        posy = screen_size[1]//2 - size[1]//2 if position[1] == -1 else position[1]
+        posy = (screen_size[1]//2 - size[1]//2) if position[1] == -1 else position[1]
         
         # Centre l'affichage de la fenetre
         self.geometry(f"{size[0]}x{size[1]}+{posx}+{posy}")
@@ -283,20 +284,21 @@ class App(tk.Tk):
 
 class Notification(App):
     MOUSE_WAIT: bool = False
+    BG_COLOR: str = "#001020"
+    FG_COLOR: str = "white"
     OPTIONS: dict = {
         "show": False,
-        "fg": "white",
-        "bg": "#203040",
+        "fg": FG_COLOR,
+        "bg": BG_COLOR,
         "align": "left"
     }
-    BG_COLOR: str = "#203040"
-    FG_COLOR: str = "white"
     DELAY: int = 8000  # 5 sec
+    WAIT: int = 1000
     SIZE: tuple = (360, 130)
     PADY: int = 10
 
     NOMBRE: int = 0
-    INSTANCES: list = list()
+    INSTANCES: list = []
 
     def __init__(self, titre, texte, **options):
         if self.get_last_instance_pos_y() < (Notification.PADY+Notification.SIZE[1]):
@@ -324,7 +326,7 @@ class Notification(App):
             valeur = self.options['bg'][1:]
             res = ""
             for i in range(3):
-                numeric = max(int("0x" + valeur[2*i:2*i+2], 16)+5, 0)
+                numeric = max(int("0x" + valeur[2*i:2*i+2], 16)+10, 0)
                 res += ("0" + hex(numeric)[2:])[-2:]
 
             return f"#{res}"
@@ -436,12 +438,12 @@ class Notification(App):
         
         if self is not Notification.INSTANCES[0]:
             # Ne pas fermer si ce n'est pas la premiere Notif
-            self.after(Notification.DELAY, self.fermer)
+            self.after(Notification.WAIT, self.fermer)
             return
 
         if Notification.MOUSE_WAIT and self.screen_width - int(x) - int(taille.split("x")[0]) == 10:
             # Ne pas fermer si curseur souris dessus et non en train de se fermer
-            self.after(Notification.DELAY, self.fermer)
+            self.after(Notification.WAIT, self.fermer)
             return
 
         x = int(x) + 10

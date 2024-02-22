@@ -1,11 +1,10 @@
-
 tkinter_classe = __import__("20-classes")
 fprint = tkinter_classe.fprint
 App: type = tkinter_classe.App
 
 
 def click(*args):
-    print(root.geometry(), flush=True)
+    print(args, flush=True)
     root.destroy()
     root.quit()
 
@@ -17,13 +16,12 @@ with root.add_frame() as frame:
         wraplength=300, 
         bg="orange",
         justify='right')
-    # label.anchor = 'w'
     label.pack()
 
     # Créer un lien hypertexte
     hyperlink = frame.add_widget("label", 
         text="[Lien vers Google]", 
-        fg="green",   #000099
+        fg="green",   # 000099
         cursor="hand2", 
         activeforeground="#0000FF",
         pady=10,
@@ -32,5 +30,3 @@ with root.add_frame() as frame:
 
 # Afficher la fenêtre
 root.mainloop()
-
-exit()
